@@ -1,0 +1,38 @@
+import os
+from dotenv import load_dotenv
+from mastodon import Mastodon, StreamListener
+
+class Bot(StreamListener):
+
+  def __init__(self):
+    super(Bot, self).__init__()
+
+  def on_update(self, status):
+    mastodon = setup()
+    bot_dict = mastodon.account_verify_credentials()
+    content = status['content'].replace('<p>', '').replace('</p>', '')
+    account = status['account']['username']
+    if bot_dict['username'] != account:
+      if content.startswith('にゃー') or content.startswith('にゃあ') or content.startswith('にゃぁ'):
+        mastodon.toot(content)
+
+
+def setup():
+  load_dotenv()
+  mastodon = Mastodon(
+    api_base_url  = os.environ['INSTANCE_URL'],
+    client_id     = os.environ['CLIENT_KEY'],
+    client_secret = os.environ['CLIENT_SECRET'],
+    access_token  = os.environ['ACCESS_TOKEN']
+  )
+  return mastodon
+
+
+def main():
+  mastodon = setup()
+  bot = Bot()
+  mastodon.stream_local(bot)
+
+
+if __name__ == '__main__':
+  main()
