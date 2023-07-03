@@ -12,8 +12,10 @@ class Bot(StreamListener):
     bot_dict = mastodon.account_verify_credentials()
     content = status['content'].replace('<p>', '').replace('</p>', '')
     account = status['account']['username']
-    if bot_dict['username'] != account:
-      if content.startswith('にゃー') or content.startswith('にゃあ') or content.startswith('にゃぁ'):
+    if bot_dict['username'] != account and content.startswith('にゃ'):
+      if len(content) > 500:
+        mastodon.toot(account + 'に壊されちゃったにゃー')
+      else:
         mastodon.toot(content)
 
 
